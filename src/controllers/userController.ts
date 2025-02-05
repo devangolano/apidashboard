@@ -57,7 +57,18 @@ class UserController {
 
       const result = await UserModel.create(userData);
       const insertId = (result as ResultSetHeader).insertId;
-      res.status(201).json({ message: 'Usuário criado com sucesso', userId: insertId });
+
+      const token = jwt.sign(
+        { id: insertId, email: email, role: adjustedRole },
+        process.env.JWT_SECRET || 'fallback_secret',
+        { expiresIn: '1h' }
+      );
+
+      res.status(201).json({ 
+        message: 'Usuário criado com sucesso', 
+        userId: insertId,
+        token: token
+      });
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       res.status(500).json({ message: 'Erro ao criar usuário' });

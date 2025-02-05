@@ -2,20 +2,28 @@ import { Router } from 'express';
 import UserController from '../controllers/userController';
 import { authMiddleware, isAdmin } from '../middleware/authMiddleware';
 import multer from 'multer';
+import path from 'path';
 
 const router = Router();
 
 // Configuração do multer para upload de arquivos
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+  }
+});
 
-// Rota de registro não deve requerer autenticação
-router.post('/register', upload.single('photo'), UserController.create);
+const upload = multer({ storage: storage });
+
+// Rotas de usuário
 router.post('/login', UserController.login);
-
-// Rotas protegidas
-router.get('/', authMiddleware, isAdmin, UserController.getAll);
-router.get('/:id', authMiddleware, isAdmin, UserController.getById);
-router.put('/:id', authMiddleware, isAdmin, UserController.update);
-router.delete('/:id', authMiddleware, isAdmin, UserController.delete);
+router.post('/users', upload.single('foto'), UserController.create);
+router.get('/users', authMiddleware, isAdmin, UserController.getAll);
+router.get('/users/:id', authMiddleware, isAdmin, UserController.getById);
+router.put('/users/:id', authMiddleware, isAdmin, upload.single('foto'), UserController.update);
+router.delete('/users/:id', authMiddleware, isAdmin, UserController.delete);
 
 export default router;
