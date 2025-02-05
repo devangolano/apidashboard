@@ -7,7 +7,9 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true, // Adicionado para suportar importação de JSON
+    "moduleResolution": "node" // Adicionado para melhor resolução de módulos
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]
