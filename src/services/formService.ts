@@ -8,7 +8,7 @@ import PDFDocument from "pdfkit"
 import fs from "fs"
 import path from "path"
 
-export class FormService {
+class FormService {
   async createForm(data: {
     formData: FormData
     checklistItems: Omit<ChecklistItem, "id" | "formId">[]
@@ -331,4 +331,7 @@ export class FormService {
     })
   }
 }
+
+export const formService = new FormService()
+export default formService
 

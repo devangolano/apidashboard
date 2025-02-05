@@ -1,7 +1,5 @@
 import type { Request, Response } from "express"
-import { FormService } from "../services/formService"
-
-const formService = new FormService()
+import { formService } from "../services/formService"
 
 export const FormController = {
   createForm: async (req: Request, res: Response) => {
