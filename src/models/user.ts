@@ -14,7 +14,7 @@ export interface User extends RowDataPacket {
   notes?: string
 }
 
-class UserModel {
+export class UserModel {
   async create(userData: Omit<User, "id">): Promise<ResultSetHeader> {
     const { nome, email, senha, cpf, celular, foto, role, notes } = userData
     const hashedPassword = await bcrypt.hash(senha, 10)
@@ -123,5 +123,6 @@ class UserModel {
   }
 }
 
-export default new UserModel()
+export const userModel = new UserModel()
+export default userModel
 

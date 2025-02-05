@@ -1,14 +1,13 @@
 import type { Form } from "../models/form"
 import { FormModel, type FormData } from "../models/form"
-import { ChecklistItem } from "../models/checklistItem"
+import { ChecklistItemModel, type ChecklistItem } from "../models/checklistItem"
 import { DocumentationItemModel, type DocumentationItem } from "../models/documentationItem"
 import pool from "../config/database"
-import type { RowDataPacket } from "mysql2"
 import PDFDocument from "pdfkit"
 import fs from "fs"
 import path from "path"
 
-class FormService {
+export class FormService {
   async createForm(data: {
     formData: FormData
     checklistItems: Omit<ChecklistItem, "id" | "formId">[]
@@ -26,14 +25,9 @@ class FormService {
       const formId = await FormModel.create(data.formData)
 
       for (const item of data.checklistItems) {
-        await ChecklistItem.create({
+        await ChecklistItemModel.create({
           ...item,
           formId,
-          standard: item.standard,
-          description: item.description,
-          condition: item.condition,
-          fe: item.fe,
-          nper: item.nper,
         })
       }
 
@@ -41,9 +35,6 @@ class FormService {
         await DocumentationItemModel.create({
           ...item,
           formId,
-          standard: item.standard,
-          description: item.description,
-          condition: item.condition,
         })
       }
 
@@ -58,10 +49,7 @@ class FormService {
   }
 
   async getFormById(id: number): Promise<Form | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>("SELECT * FROM forms WHERE id = ?", [id])
-
-    if (rows.length === 0) return null
-    return rows[0] as Form
+    return FormModel.getById(id)
   }
 
   async updateForm(
@@ -78,18 +66,13 @@ class FormService {
       await connection.beginTransaction()
 
       await FormModel.update(id, data.formData)
-      await ChecklistItem.deleteByFormId(id)
+      await ChecklistItemModel.deleteByFormId(id)
       await DocumentationItemModel.deleteByFormId(id)
 
       for (const item of data.checklistItems) {
-        await ChecklistItem.create({
+        await ChecklistItemModel.create({
           ...item,
           formId: id,
-          standard: item.standard,
-          description: item.description,
-          condition: item.condition,
-          fe: item.fe,
-          nper: item.nper,
         })
       }
 
@@ -97,9 +80,6 @@ class FormService {
         await DocumentationItemModel.create({
           ...item,
           formId: id,
-          standard: item.standard,
-          description: item.description,
-          condition: item.condition,
         })
       }
 
@@ -118,7 +98,7 @@ class FormService {
     try {
       await connection.beginTransaction()
 
-      await ChecklistItem.deleteByFormId(id)
+      await ChecklistItemModel.deleteByFormId(id)
       await DocumentationItemModel.deleteByFormId(id)
       await FormModel.delete(id)
 
@@ -142,7 +122,7 @@ class FormService {
     if (!form) {
       throw new Error("Form not found")
     }
-    const checklistItems = await ChecklistItem.getByFormId(id)
+    const checklistItems = await ChecklistItemModel.getByFormId(id)
     const documentationItems = await DocumentationItemModel.getByFormId(id)
     return { form, checklistItems, documentationItems }
   }

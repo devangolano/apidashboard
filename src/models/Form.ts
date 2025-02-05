@@ -1,6 +1,5 @@
-//@ts-nocheck
 import pool from "../config/database"
-import type { RowDataPacket, ResultSetHeader } from "mysql2"
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise"
 
 export interface FormData {
   empresa: string
@@ -76,4 +75,6 @@ export const FormModel = {
     }))
   },
 }
+
+export default FormModel
 

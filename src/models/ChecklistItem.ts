@@ -1,6 +1,5 @@
-//@ts-nocheck
 import pool from "../config/database"
-import type { RowDataPacket, ResultSetHeader } from "mysql2"
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise"
 
 export interface ChecklistItem {
   id?: number
@@ -15,7 +14,7 @@ export interface ChecklistItem {
   comment?: string
 }
 
-export const ChecklistItem = {
+export const ChecklistItemModel = {
   async create(item: Omit<ChecklistItem, "id">): Promise<number> {
     const [result] = await pool.query<ResultSetHeader>(
       "INSERT INTO checklist_items (form_id, standard, description, `condition`, fe, nper, photo, audio, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -78,4 +77,6 @@ export const ChecklistItem = {
     return errors
   },
 }
+
+export default ChecklistItemModel
 

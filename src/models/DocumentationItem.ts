@@ -1,6 +1,5 @@
-//@ts-nocheck
 import pool from "../config/database"
-import type { RowDataPacket, ResultSetHeader } from "mysql2"
+import type { RowDataPacket, ResultSetHeader } from "mysql2/promise"
 
 export interface DocumentationItemData {
   formId: number
@@ -84,4 +83,6 @@ export const DocumentationItemModel = {
     }
   },
 }
+
+export default DocumentationItemModel
 
