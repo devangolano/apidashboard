@@ -1,0 +1,14 @@
+CREATE DATABASE IF NOT EXISTS apidashboard;
+
+USE apidashboard;
+
+CREATE TABLE forms (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  empresa VARCHAR(255) NOT NULL,
+  area VARCHAR(255) NOT NULL,
+  data DATE NOT NULL,
+  hora TIME NOT NULL,
+  executado_por VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
