@@ -1,4 +1,5 @@
-export * as Form from "./Form"
-export * as ChecklistItem from "./ChecklistItem"
-export * as DocumentationItem from "./DocumentationItem"
+export * as Form from "./form"
+export * as ChecklistItem from "./checklistItem"
+export * as DocumentationItem from "./documentationItem"
+export * as User from "./user"
 
