@@ -1,17 +1,38 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import routes from './routes';
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
+import routes from "./routes"
 
-const app = express();
+// Carrega as variáveis de ambiente
+dotenv.config()
 
-app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+const app = express()
 
-app.use('/api', routes);
+// Middleware
+app.use(cors())
+app.use(express.json({ limit: "50mb" }))
+app.use(express.urlencoded({ limit: "50mb", extended: true }))
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// Rotas
+app.use("/api", routes)
+
+// Rota de saúde para verificar se o servidor está rodando
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Servidor está rodando" })
+})
+
+const PORT = process.env.PORT || 3000
+
+// Inicia o servidor
+const server = app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`)
+})
+
+// Tratamento de erros não capturados
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason)
+  // Aplicação continua rodando, mas registra o erro
+})
+
+export default server
+

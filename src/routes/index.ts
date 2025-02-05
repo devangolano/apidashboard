@@ -1,19 +1,19 @@
-import userRoutes from './userRoutes';
-import express from 'express';
-import * as formController from '../controllers/formController';
+import express from "express"
+import userRoutes from "./userRoutes"
+import { FormController } from "../controllers/formController"
 
-const router = express.Router();
+const router = express.Router()
 
-// Form routes
-router.post("/forms", formController.createForm)
-router.get("/forms/:id", formController.getForm)
-router.put("/forms/:id", formController.updateForm)
-router.delete("/forms/:id", formController.deleteForm)
-router.get("/forms", formController.listForms)
-router.get("/forms/:id/pdf", formController.downloadFormPDF)
+// Rotas de formulário
+router.post("/forms", FormController.createForm)
+router.get("/forms/:id", FormController.getForm)
+router.put("/forms/:id", FormController.updateForm)
+router.delete("/forms/:id", FormController.deleteForm)
+router.get("/forms", FormController.listForms)
+router.get("/forms/:id/pdf", FormController.generatePDF)
 
-// User routes
-// Instead of nesting, we'll define them at the same level
-router.use('/', userRoutes);
+// Rotas de usuário
+router.use("/", userRoutes)
 
-export default router;
+export default router
+
