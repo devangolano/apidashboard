@@ -8,29 +8,10 @@ dotenv.config()
 
 const app = express()
 
-// Configuração do CORS
-const corsOptions = {
-  origin: ['https://dashboard-six-weld-47.vercel.app', 'http://localhost:5173', '*'], // Adicionado '*' para teste
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  optionsSuccessStatus: 204
-}
 
-// Middleware para logging detalhado de requisições CORS
-app.use((req, res, next) => {
-  console.log('CORS Request:');
-  console.log('Origin:', req.headers.origin);
-  console.log('Method:', req.method);
-  console.log('Headers:', req.headers);
-  next();
-});
 
 // Aplicar CORS para todas as rotas
-app.use(cors(corsOptions))
-
-// Lidar explicitamente com requisições OPTIONS
-app.options('*', cors(corsOptions));
+app.use(cors())
 
 // Middleware para parsing de JSON e dados de formulário
 app.use(express.json({ limit: "50mb" }))
