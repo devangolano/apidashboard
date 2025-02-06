@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import UserModel, { type User } from "../models/user";
 import type { ResultSetHeader } from "mysql2";
 
@@ -44,10 +45,13 @@ class UserController {
 
       const adjustedRole = role === "Administrador" ? "admin" : "user";
 
+      // Hash da senha
+      const hashedSenha = await bcrypt.hash(senha, 10);
+
       const userData: UserCreateData = {
         nome,
         email,
-        senha,
+        senha: hashedSenha,
         cpf,
         celular,
         foto,
@@ -84,7 +88,6 @@ class UserController {
   
       const { email, senha } = req.body;
   
-      // Validação básica
       if (!email || !senha) {
         console.log('Email ou senha faltando');
         res.status(400).json({ 
@@ -103,7 +106,7 @@ class UserController {
         return;
       }
   
-      const isValidPassword = await UserModel.comparePassword(senha, user.senha);
+      const isValidPassword = await bcrypt.compare(senha, user.senha);
       
       console.log('Senha válida:', isValidPassword ? 'Sim' : 'Não');
   
@@ -188,13 +191,17 @@ class UserController {
       const userData: Partial<Omit<User, "id">> = {
         nome,
         email,
-        senha,
         cpf,
         celular,
         foto,
         role: adjustedRole,
         notes,
       };
+
+      // Se uma nova senha for fornecida, faça o hash
+      if (senha) {
+        userData.senha = await bcrypt.hash(senha, 10);
+      }
 
       // Remove undefined fields
       Object.keys(userData).forEach(
