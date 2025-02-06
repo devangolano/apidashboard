@@ -77,26 +77,49 @@ class UserController {
 
   async login(req: Request, res: Response): Promise<void> {
     try {
+      console.log('Requisição de login recebida:', {
+        body: req.body,
+        headers: req.headers
+      });
+  
       const { email, senha } = req.body;
-
+  
+      // Validação básica
+      if (!email || !senha) {
+        console.log('Email ou senha faltando');
+        res.status(400).json({ 
+          message: "Email e senha são obrigatórios",
+          received: { email: !!email, senha: !!senha }
+        });
+        return;
+      }
+  
       const user = await UserModel.findByEmail(email);
+      
+      console.log('Usuário encontrado:', user ? 'Sim' : 'Não');
+  
       if (!user) {
         res.status(401).json({ message: "Credenciais inválidas" });
         return;
       }
-
+  
       const isValidPassword = await UserModel.comparePassword(senha, user.senha);
+      
+      console.log('Senha válida:', isValidPassword ? 'Sim' : 'Não');
+  
       if (!isValidPassword) {
         res.status(401).json({ message: "Credenciais inválidas" });
         return;
       }
-
+  
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET || "fallback_secret",
-        { expiresIn: "1h" },
+        { expiresIn: "1h" }
       );
-
+  
+      console.log('Token gerado com sucesso');
+  
       res.json({
         message: "Login bem-sucedido",
         token,
@@ -104,11 +127,11 @@ class UserController {
           id: user.id,
           nome: user.nome,
           email: user.email,
-          role: user.role,
-        },
+          role: user.role
+        }
       });
     } catch (error) {
-      console.error("Erro no login:", error);
+      console.error('Erro no login:', error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   }
