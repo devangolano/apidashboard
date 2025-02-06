@@ -36,3 +36,10 @@ coverage/
 # Configurações locais
 *.local
 .env.*
+
+# TypeScript
+*.tsbuildinfo
+
+# Arquivos de cache do TypeScript e build temporário
+tsconfig.tsbuildinfo
+.cache/
