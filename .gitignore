@@ -1,7 +1,5 @@
 # Diretórios e arquivos do Node.js
 node_modules/
-dist/
-build/
 .env
 npm-debug.log*
 yarn-debug.log*
@@ -20,18 +18,6 @@ temp/
 *.seed
 *.pid.lock
 
-# IDEs e Ferramentas
-.vscode/
-.idea/
-.DS_Store
-
-# Sistema Operacional
-Thumbs.db
-desktop.ini
-
-# Testes e Coverage
-coverage/
-.nyc_output/
 
 # Configurações locais
 *.local
