@@ -18,18 +18,12 @@ export class FormService {
     try {
       await connection.beginTransaction()
 
-      if (!data.formData || !data.checklistItems || !data.documentationItems) {
-        throw new Error("Invalid form data structure")
-      }
-
       const formId = await FormModel.create(data.formData)
 
       for (const item of data.checklistItems) {
         await ChecklistItemModel.create({
           ...item,
           formId,
-          standard: item.standard || "N/A",
-          description: item.description || "N/A",
         })
       }
 
@@ -37,8 +31,6 @@ export class FormService {
         await DocumentationItemModel.create({
           ...item,
           formId,
-          standard: item.standard || "N/A",
-          description: item.description || "N/A",
         })
       }
 
@@ -46,7 +38,6 @@ export class FormService {
       return formId
     } catch (error) {
       await connection.rollback()
-      console.error("Error in createForm:", error)
       throw error
     } finally {
       connection.release()

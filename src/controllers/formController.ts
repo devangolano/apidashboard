@@ -1,10 +1,54 @@
 import type { Request, Response } from "express"
 import { formService } from "../services/formService"
+import type { FormData } from "../models/Form"
+import type { ChecklistItem } from "../models/ChecklistItem"
+import type { DocumentationItem } from "../models/DocumentationItem"
 
 export const FormController = {
   createForm: async (req: Request, res: Response) => {
     try {
-      const formId = await formService.createForm(req.body)
+      const { formData, checklistItems, documentationItems } = req.body
+
+      // Validate and process formData
+      const processedFormData: FormData = {
+        empresa: formData.empresa,
+        area: formData.area,
+        data: formData.data,
+        hora: formData.hora,
+        executadoPor: formData.executadoPor,
+      }
+
+      // Process checklistItems
+      const processedChecklistItems: Omit<ChecklistItem, "id" | "formId">[] = checklistItems.map((item: any) => ({
+        standard: item.standard,
+        description: item.description,
+        condition: item.condition,
+        fe: item.fe,
+        nper: item.nper,
+        photo: item.photo || null,
+        audio: item.audio || null,
+        comment: item.comment || null,
+      }))
+
+      // Process documentationItems
+      const processedDocumentationItems: Omit<DocumentationItem, "id" | "formId">[] = documentationItems.map(
+        (item: any) => ({
+          standard: item.standard,
+          description: item.description,
+          condition: item.condition,
+          photo: item.photo || null,
+          audio: item.audio || null,
+          pdf: item.pdf || null,
+          comment: item.comment || null,
+        }),
+      )
+
+      const formId = await formService.createForm({
+        formData: processedFormData,
+        checklistItems: processedChecklistItems,
+        documentationItems: processedDocumentationItems,
+      })
+
       res.status(201).json({ id: formId })
     } catch (error) {
       console.error("Error in createForm:", error)

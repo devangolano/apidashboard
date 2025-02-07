@@ -16,54 +16,89 @@ export interface ChecklistItem {
 
 export const ChecklistItemModel = {
   async create(item: Omit<ChecklistItem, "id">): Promise<number> {
-    const [result] = await pool.query<ResultSetHeader>(
-      "INSERT INTO checklist_items (form_id, standard, description, `condition`, fe, nper, photo, audio, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [
-        item.formId,
-        item.standard,
-        item.description,
-        item.condition,
-        item.fe,
-        item.nper,
-        item.photo,
-        item.audio,
-        item.comment,
-      ],
-    )
-    return result.insertId
+    const errors = this.validate(item)
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(", ")}`)
+    }
+
+    try {
+      const [result] = await pool.query<ResultSetHeader>(
+        "INSERT INTO checklist_items (form_id, standard, description, `condition`, fe, nper, photo, audio, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          item.formId,
+          item.standard,
+          item.description,
+          item.condition,
+          item.fe,
+          item.nper,
+          item.photo || null,
+          item.audio || null,
+          item.comment || null,
+        ],
+      )
+      return result.insertId
+    } catch (error) {
+      console.error("Error creating checklist item:", error)
+      throw new Error("Failed to create checklist item")
+    }
   },
 
   async getByFormId(formId: number): Promise<ChecklistItem[]> {
-    const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM checklist_items WHERE form_id = ?", [formId])
-    return rows as ChecklistItem[]
+    try {
+      const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM checklist_items WHERE form_id = ?", [formId])
+      return rows as ChecklistItem[]
+    } catch (error) {
+      console.error("Error fetching checklist items by form ID:", error)
+      throw new Error("Failed to fetch checklist items")
+    }
   },
 
   async deleteByFormId(formId: number): Promise<void> {
-    await pool.query("DELETE FROM checklist_items WHERE form_id = ?", [formId])
+    try {
+      await pool.query("DELETE FROM checklist_items WHERE form_id = ?", [formId])
+    } catch (error) {
+      console.error("Error deleting checklist items by form ID:", error)
+      throw new Error("Failed to delete checklist items")
+    }
   },
 
   async getById(id: number): Promise<ChecklistItem | null> {
-    const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM checklist_items WHERE id = ?", [id])
-    return rows.length > 0 ? (rows[0] as ChecklistItem) : null
+    try {
+      const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM checklist_items WHERE id = ?", [id])
+      return rows.length > 0 ? (rows[0] as ChecklistItem) : null
+    } catch (error) {
+      console.error("Error fetching checklist item by ID:", error)
+      throw new Error("Failed to fetch checklist item")
+    }
   },
 
   async update(id: number, item: Partial<ChecklistItem>): Promise<boolean> {
-    const [result] = await pool.query<ResultSetHeader>(
-      "UPDATE checklist_items SET form_id = ?, standard = ?, description = ?, `condition` = ?, fe = ?, nper = ?, photo = ?, audio = ?, comment = ? WHERE id = ?",
-      [
-        item.formId,
-        item.standard,
-        item.description,
-        item.condition,
-        item.fe,
-        item.nper,
-        item.photo,
-        item.audio,
-        item.comment,
-        id,
-      ],
-    )
-    return result.affectedRows > 0
+    const errors = this.validate(item)
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(", ")}`)
+    }
+
+    try {
+      const [result] = await pool.query<ResultSetHeader>(
+        "UPDATE checklist_items SET form_id = ?, standard = ?, description = ?, `condition` = ?, fe = ?, nper = ?, photo = ?, audio = ?, comment = ? WHERE id = ?",
+        [
+          item.formId,
+          item.standard,
+          item.description,
+          item.condition,
+          item.fe,
+          item.nper,
+          item.photo || null,
+          item.audio || null,
+          item.comment || null,
+          id,
+        ],
+      )
+      return result.affectedRows > 0
+    } catch (error) {
+      console.error("Error updating checklist item:", error)
+      throw new Error("Failed to update checklist item")
+    }
   },
 
   validate(item: Partial<ChecklistItem>): string[] {
