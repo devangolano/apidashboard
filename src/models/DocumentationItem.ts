@@ -44,7 +44,11 @@ export const DocumentationItemModel = {
       return result.insertId
     } catch (error) {
       console.error("Error creating documentation item:", error)
-      throw new Error("Failed to create documentation item")
+      if (error instanceof Error) {
+        throw new Error(`Failed to create documentation item: ${error.message}`)
+      } else {
+        throw new Error("Failed to create documentation item: Unknown error")
+      }
     }
   },
 
@@ -74,59 +78,6 @@ export const DocumentationItemModel = {
     }
   },
 
-  async update(id: number, item: Partial<DocumentationItemData>): Promise<boolean> {
-    const errors = this.validate(item, true)
-    if (errors.length > 0) {
-      throw new Error(`Validation failed: ${errors.join(", ")}`)
-    }
-
-    try {
-      const [result] = await pool.query<ResultSetHeader>(
-        `UPDATE documentation_items SET 
-         form_id = IFNULL(?, form_id),
-         standard = IFNULL(?, standard),
-         description = IFNULL(?, description),
-         \`condition\` = IFNULL(?, \`condition\`),
-         comment = IFNULL(?, comment),
-         photo = IFNULL(?, photo),
-         audio = IFNULL(?, audio),
-         pdf = IFNULL(?, pdf)
-         WHERE id = ?`,
-        [
-          item.formId,
-          item.standard,
-          item.description,
-          item.condition,
-          item.comment,
-          item.photo,
-          item.audio,
-          item.pdf,
-          id,
-        ],
-      )
-      return result.affectedRows > 0
-    } catch (error) {
-      console.error("Error updating documentation item:", error)
-      throw new Error("Failed to update documentation item")
-    }
-  },
-
-  async getById(id: number): Promise<DocumentationItem | null> {
-    try {
-      const [rows] = await pool.query<DocumentationItemRow[]>("SELECT * FROM documentation_items WHERE id = ?", [id])
-      if (rows.length === 0) return null
-      const row = rows[0]
-      return {
-        ...row,
-        id: row.id,
-        formId: row.form_id,
-      }
-    } catch (error) {
-      console.error("Error fetching documentation item by ID:", error)
-      throw new Error("Failed to fetch documentation item")
-    }
-  },
-
   validate(item: Partial<DocumentationItemData>, isUpdate = false): string[] {
     const errors: string[] = []
     if (!isUpdate) {
@@ -142,6 +93,14 @@ export const DocumentationItemModel = {
       if (item.condition !== undefined && typeof item.condition !== "string")
         errors.push("condition deve ser uma string")
     }
+
+    // Validação adicional para o tamanho dos campos
+    if (item.standard && item.standard.length > 255) errors.push("standard deve ter no máximo 255 caracteres")
+    if (item.description && item.description.length > 1000)
+      errors.push("description deve ter no máximo 1000 caracteres")
+    if (item.condition && item.condition.length > 255) errors.push("condition deve ter no máximo 255 caracteres")
+    if (item.comment && item.comment.length > 1000) errors.push("comment deve ter no máximo 1000 caracteres")
+
     return errors
   },
 }

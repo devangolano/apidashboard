@@ -28,17 +28,28 @@ export class FormService {
       }
 
       for (const item of data.documentationItems) {
-        await DocumentationItemModel.create({
-          ...item,
-          formId,
-        })
+        console.log("Tentando criar item de documentação:", JSON.stringify(item, null, 2))
+        try {
+          await DocumentationItemModel.create({
+            ...item,
+            formId,
+          })
+        } catch (docError) {
+          console.error("Erro ao criar item de documentação:", docError)
+          throw docError
+        }
       }
 
       await connection.commit()
       return formId
     } catch (error) {
       await connection.rollback()
-      throw error
+      console.error("Erro ao criar formulário:", error)
+      if (error instanceof Error) {
+        throw new Error(`Falha ao criar formulário: ${error.message}`)
+      } else {
+        throw new Error("Falha ao criar formulário: Erro desconhecido")
+      }
     } finally {
       connection.release()
     }
