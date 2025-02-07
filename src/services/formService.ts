@@ -28,6 +28,8 @@ export class FormService {
         await ChecklistItemModel.create({
           ...item,
           formId,
+          standard: item.standard || "N/A",
+          description: item.description || "N/A",
         })
       }
 
@@ -35,6 +37,8 @@ export class FormService {
         await DocumentationItemModel.create({
           ...item,
           formId,
+          standard: item.standard || "N/A",
+          description: item.description || "N/A",
         })
       }
 
@@ -42,6 +46,7 @@ export class FormService {
       return formId
     } catch (error) {
       await connection.rollback()
+      console.error("Error in createForm:", error)
       throw error
     } finally {
       connection.release()
