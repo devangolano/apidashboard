@@ -1,8 +1,9 @@
-import { Router } from 'express';
+import { Router, Express } from 'express';
 import UserController from '../controllers/userController';
 import { authMiddleware, isAdmin } from '../middleware/authMiddleware';
 import multer from 'multer';
 import path from 'path';
+import express from 'express';
 
 const router = Router();
 
@@ -25,5 +26,10 @@ router.get('/users', authMiddleware, isAdmin, UserController.getAll);
 router.get('/users/:id', authMiddleware, isAdmin, UserController.getById);
 router.put('/users/:id', authMiddleware, isAdmin, upload.single('foto'), UserController.update);
 router.delete('/users/:id', authMiddleware, isAdmin, UserController.delete);
+
+// Função para configurar a rota de arquivos estáticos
+export const configureStaticRoute = (app: Express) => {
+  app.use('/api/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+};
 
 export default router;
