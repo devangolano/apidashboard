@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import routes from "./routes"
+import path from 'path';
 
 // Carrega as variáveis de ambiente
 dotenv.config()
@@ -26,6 +27,10 @@ app.use((req, res, next) => {
 
 // Rotas da API
 app.use("/api", routes)
+
+// Configuração para servir arquivos estáticos
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Rota de saúde para verificar se o servidor está rodando
 app.get("/health", (req, res) => {
