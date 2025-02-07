@@ -27,6 +27,12 @@ export const DocumentationItemModel = {
       throw new Error(`Validation failed: ${errors.join(", ")}`)
     }
 
+    // Adicione esta verificação de tamanho
+    if (item.pdf && item.pdf.length > 16 * 1024 * 1024) {
+      // 16MB limit
+      throw new Error("PDF file is too large. Maximum size is 16MB.")
+    }
+
     try {
       const [result] = await pool.query<ResultSetHeader>(
         "INSERT INTO documentation_items (form_id, standard, description, `condition`, comment, photo, audio, pdf) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -100,6 +106,11 @@ export const DocumentationItemModel = {
       errors.push("description deve ter no máximo 1000 caracteres")
     if (item.condition && item.condition.length > 255) errors.push("condition deve ter no máximo 255 caracteres")
     if (item.comment && item.comment.length > 1000) errors.push("comment deve ter no máximo 1000 caracteres")
+
+    // Adicione esta validação de tamanho para o PDF
+    if (item.pdf && item.pdf.length > 16 * 1024 * 1024) {
+      errors.push("O arquivo PDF não pode ser maior que 16MB")
+    }
 
     return errors
   },
