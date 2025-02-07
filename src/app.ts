@@ -33,12 +33,7 @@ app.use((req, res, next) => {
   next()
 })
 
-// Middleware para servir arquivos estáticos (DEVE VIR ANTES DAS ROTAS DA API)
-app.use('/uploads', express.static(uploadsDir, {
-  setHeaders: (res, path, stat) => {
-    res.set('X-Content-Type-Options', 'nosniff')
-  }
-}))
+app.use('/api/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Rotas da API
 app.use("/api", routes)
