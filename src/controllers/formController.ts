@@ -27,7 +27,8 @@ export const FormController = {
         nper: item.nper,
         photo: item.photo || null,
         audio: item.audio || null,
-        comment: item.comment || null,
+        irregularidades: item.irregularidades || null,
+        recomendacoes: item.recomendacoes || null,
       }))
 
       // Process documentationItems
@@ -39,7 +40,8 @@ export const FormController = {
           photo: item.photo || null,
           audio: item.audio || null,
           pdf: item.pdf || null,
-          comment: item.comment || null,
+          recomendacoes: item.recomendacoes || null,
+          irregularidades: item.irregularidades || null,
         }),
       )
 

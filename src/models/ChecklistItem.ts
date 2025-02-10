@@ -11,7 +11,8 @@ export interface ChecklistItem {
   nper: string
   photo?: string
   audio?: string
-  comment?: string
+  irregularidades: string
+  recomendacoes: string
 }
 
 export const ChecklistItemModel = {
@@ -23,7 +24,7 @@ export const ChecklistItemModel = {
 
     try {
       const [result] = await pool.query<ResultSetHeader>(
-        "INSERT INTO checklist_items (form_id, standard, description, `condition`, fe, nper, photo, audio, comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO checklist_items (form_id, standard, description, `condition`, fe, nper, photo, audio, irregularidades, recomendacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           item.formId,
           item.standard,
@@ -33,7 +34,8 @@ export const ChecklistItemModel = {
           item.nper,
           item.photo || null,
           item.audio || null,
-          item.comment || null,
+          item.irregularidades || null,
+          item.recomendacoes || null
         ],
       )
       return result.insertId
@@ -80,7 +82,7 @@ export const ChecklistItemModel = {
 
     try {
       const [result] = await pool.query<ResultSetHeader>(
-        "UPDATE checklist_items SET form_id = ?, standard = ?, description = ?, `condition` = ?, fe = ?, nper = ?, photo = ?, audio = ?, comment = ? WHERE id = ?",
+        "UPDATE checklist_items SET form_id = ?, standard = ?, description = ?, `condition` = ?, fe = ?, nper = ?, photo = ?, audio = ?, recomendacoes = ?, irregularidades = ? WHERE id = ?",
         [
           item.formId,
           item.standard,
@@ -90,8 +92,10 @@ export const ChecklistItemModel = {
           item.nper,
           item.photo || null,
           item.audio || null,
-          item.comment || null,
           id,
+          item.irregularidades || null,
+          item.recomendacoes || null
+
         ],
       )
       return result.affectedRows > 0
@@ -109,6 +113,8 @@ export const ChecklistItemModel = {
     if (!item.condition) errors.push("condition é obrigatório")
     if (!item.fe) errors.push("fe é obrigatório")
     if (!item.nper) errors.push("nper é obrigatório")
+    if (!item.irregularidades) errors.push("irregularidades é obrigatório")
+    if (!item.recomendacoes) errors.push("recomendacoes é obrigatório")
     return errors
   },
 }

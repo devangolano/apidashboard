@@ -10,6 +10,8 @@ export interface DocumentationItemData {
   photo?: string
   audio?: string
   pdf?: string
+  irregularidades: string
+  recomendacoes: string
 }
 
 export interface DocumentationItem extends DocumentationItemData {
@@ -35,16 +37,17 @@ export const DocumentationItemModel = {
 
     try {
       const [result] = await pool.query<ResultSetHeader>(
-        "INSERT INTO documentation_items (form_id, standard, description, `condition`, comment, photo, audio, pdf) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO documentation_items (form_id, standard, description, `condition`, photo, audio, pdf, irregularidades, recomendacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           item.formId,
           item.standard,
           item.description,
           item.condition,
-          item.comment || null,
           item.photo || null,
           item.audio || null,
           item.pdf || null,
+          item.irregularidades || null,
+          item.recomendacoes || null
         ],
       )
       return result.insertId
@@ -91,6 +94,8 @@ export const DocumentationItemModel = {
       if (!item.standard) errors.push("standard é obrigatório")
       if (!item.description) errors.push("description é obrigatório")
       if (!item.condition) errors.push("condition é obrigatório")
+      if (!item.irregularidades) errors.push("irregularidades é obrigatório") // Mantido
+      if (!item.recomendacoes) errors.push("recomendacoes é obrigatório") // Mantido
     } else {
       if (item.formId !== undefined && typeof item.formId !== "number") errors.push("formId deve ser um número")
       if (item.standard !== undefined && typeof item.standard !== "string") errors.push("standard deve ser uma string")
@@ -105,7 +110,8 @@ export const DocumentationItemModel = {
     if (item.description && item.description.length > 1000)
       errors.push("description deve ter no máximo 1000 caracteres")
     if (item.condition && item.condition.length > 255) errors.push("condition deve ter no máximo 255 caracteres")
-    if (item.comment && item.comment.length > 1000) errors.push("comment deve ter no máximo 1000 caracteres")
+    if (item.recomendacoes && item.recomendacoes.length > 1000) errors.push("recomendacoes deve ter no máximo 1000 caracteres")
+      if (item.irregularidades && item.irregularidades.length > 1000) errors.push("irregularidades deve ter no máximo 1000 caracteres")
 
     // Adicione esta validação de tamanho para o PDF
     if (item.pdf && item.pdf.length > 16 * 1024 * 1024) {
